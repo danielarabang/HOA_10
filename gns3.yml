@@ -1,0 +1,61 @@
+---
+- name: Configuration of Router
+  hosts: router
+  connection: network_cli
+  gather_facts: no
+  tasks:
+
+    - name: Setting Hostname for Designated Router
+      ios_config:
+        lines:
+          - hostname R1_Rabang
+      register: hostname_result
+
+    - name: Create password for priviledged user
+      ios_config:
+        commands:
+          - enable secret class
+
+    - name: Create password for line console 0
+      ios_config:
+        commands:
+          - line console 0
+          - password cisco
+          - login
+      register: console_password_result
+
+    - name: Ensure passwords are encrypted
+      ios_config:
+        commands:
+          - enable secret class
+
+    - name: Add bannermotd for warning unauthorized users
+      ios_config:
+        lines:
+          - banner motd
+            $Unauthorized users are prohibited.$
+      register: banner_result
+
+    - name: Save current config to startup conffig
+      ios_config:
+        save_when: modified
+
+    - name: Gather running configuration
+      ios_command:
+        commands:
+          - show run
+      register: run_output
+
+    - name: Verification of running configuration from Manage Node
+      debug:
+        var: run_output.stdout_lines
+
+    - name: Gather Interface Information
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: interface_output
+
+    - name: Verification of  interface information from Manage Node
+      debug:
+        var: interface_output.stdout_lines

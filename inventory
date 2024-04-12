@@ -1,0 +1,9 @@
+[router]
+R1_Rabang
+
+[router:vars]
+ansible_user=admin
+ansible_password=cisco
+ansible_network_os=ios
+ansible_become=yes
+ansible_become_metho=enable
